@@ -40,3 +40,28 @@ acp/
 cd infra
 docker compose up -d
 docker ps
+
+## Test Rate Limiting
+
+1) Set RPM limit (example: 10)
+```bash
+cd apps/gateway
+python -m app.set_limit
+
+# 2) Run API (new terminal)
+cd apps/gateway
+.\.venv\Scripts\activate
+uvicorn app.main:app --reload --port 8000
+
+# 3) Check health
+curl http://127.0.0.1:8000/health
+
+# 4) Test protected route (PowerShell)
+Invoke-WebRequest -Uri "http://127.0.0.1:8000/protected" -Headers @{Authorization="Bearer demo-secret-key"} -UseBasicParsing
+
+# 5) Rate-limit test (30 hits)
+for ($i=1; $i -le 30; $i++) {
+  $code = (Invoke-WebRequest -Uri "http://127.0.0.1:8000/protected" -Headers @{Authorization="Bearer demo-secret-key"} -UseBasicParsing).StatusCode
+  "$i -> $code"
+}
+
