@@ -17,3 +17,8 @@ Thumbs.db
 
 # Logs
 *.log
+# env files
+
+.env
+.env.*
+!.env.example
